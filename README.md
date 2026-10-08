@@ -6,20 +6,8 @@ This document consolidates operational notes for future reference while working 
 
 > Operational note: Command syntax and UI labels can vary by AOS, Prism, and SDK version. Validate commands with the approved runbook and change process before using them in production.
 
-## 1. Quick Reference
 
-| Task | Command or location | Expected use |
-|---|---|---|
-| Unlock a locked user | `allssh sudo faillock --user admin --reset` | Clears the failed-login lock for the `admin` user across the CVMs reached by `allssh`. |
-| Download SDK / Service Delivery Kit | `partner.nutanix.com` → **Library** | Locate and download the required Service Delivery Kit. |
-| Check cluster status | `cluster status` | Review overall cluster and service status. |
-| List AHV hosts | `acli host.list` | Display the AHV hosts known to the cluster. |
-| Shut down a CVM | `cvm_shutdown -P now` | Gracefully shut down the CVM; use only with proper approval. |
-| Open ACLI | `acli` | Enter the Acropolis CLI prompt. |
-| Enter host maintenance mode | `host.enter_maintenance_mode <host IP>` | Place the specified AHV host into maintenance mode. |
-| Exit host maintenance mode | `host.exit_maintenance_mode <host IP>` | Return the specified AHV host to normal operation. |
-
-## 2. Unlocking a Locked User
+## 1. Unlocking a Locked User
 
 ### Command
 
@@ -42,7 +30,7 @@ allssh sudo faillock --user admin --reset
 * The example targets the `admin` user. Replace the username only when the approved operational procedure requires it.
 * Investigate the cause of repeated lockouts instead of repeatedly clearing the lock.
 
-## 3. Downloading the Service Delivery Kit / SDK
+## 2. Downloading the Service Delivery Kit / SDK
 
 1. Open [partner.nutanix.com](https://partner.nutanix.com).
 2. Sign in with an account that has access to partner resources.
@@ -52,7 +40,7 @@ allssh sudo faillock --user admin --reset
 6. Download the package and store it in the approved internal repository.
 7. Record the downloaded version for future troubleshooting and reproducibility.
 
-## 4. AHV and CVM Architecture Overview
+## 3. AHV and CVM Architecture Overview
 
 ### AHV
 
@@ -67,7 +55,7 @@ The Controller Virtual Machine provides Nutanix cluster services, including stor
 * **If an AHV host is down:** VMs may restart on another healthy AHV host. Do not describe this as guaranteed live migration: a hard host failure and planned maintenance have different behaviors, and VM settings, capacity, HA configuration, and migration eligibility affect the result.
 * **If a CVM is down:** The VM can remain running on its AHV host while the redundant Nutanix data path uses another healthy CVM as needed. This does not mean every I/O operation is necessarily remote; expect possible temporary interruption or degraded performance and check the CVM and cluster status promptly.
 
-## 5. Example Internal Network Mapping
+## 4. Example Internal Network Mapping
 
 The following values are examples captured during training and should be validated against the target cluster before use.
 
@@ -93,7 +81,7 @@ ssh nutanix@192.168.5.2
 
 Use the correct username, IP address, and authentication method for the target environment. Treat the IP above as an example CVM address.
 
-## 6. Basic Cluster Validation Commands
+## 5. Basic Cluster Validation Commands
 
 ### Check cluster status
 
@@ -111,7 +99,7 @@ acli host.list
 
 This displays the AHV hosts available to the cluster and helps identify the host that will be placed into or removed from maintenance mode.
 
-## 7. CVM Shutdown Procedure
+## 6. CVM Shutdown Procedure
 
 ### Command
 
@@ -143,7 +131,7 @@ cvm_shutdown -P now
 
 > Although `-P now` requests an immediate graceful shutdown, do not use it as a routine troubleshooting step without understanding the impact and following the approved Nutanix procedure.
 
-## 8. AHV Host Maintenance Mode
+## 7. AHV Host Maintenance Mode
 
 ### Entering maintenance mode
 
@@ -220,7 +208,7 @@ Before placing a host into maintenance mode, specifically check VMs with affinit
 * If a VM cannot evacuate, follow the approved process to modify the rule temporarily, power off the VM if permitted, or schedule separate handling.
 * After maintenance, confirm that the intended affinity policy is restored and that the VM placement is correct.
 
-## 9. CVM Failure and Data Locality Scenario
+## 8. CVM Failure and Data Locality Scenario
 
 ### Scenario
 
@@ -248,7 +236,7 @@ A CVM becomes unavailable while the AHV host and its VMs remain online.
 6. Restore or reboot the affected CVM according to the approved procedure.
 7. Recheck cluster health and confirm data services have returned to the expected state.
 
-## 10. Active Directory and SAML-Based Directory Integration
+## 9. Active Directory and SAML-Based Directory Integration
 
 ### Why use directory integration?
 
@@ -297,7 +285,7 @@ Centralized directory integration avoids creating and maintaining a separate loc
 
 For large environments, manage access through directory groups and authorization roles rather than creating thousands of local Nutanix users individually. Local accounts should be limited to approved emergency or service-account use cases and governed by security policy.
 
-## 11. Suggested Operational Checklist
+## 10. Suggested Operational Checklist
 
 ### Before a change
 
@@ -324,7 +312,7 @@ For large environments, manage access through directory groups and authorization
 * Confirm affinity policies and directory access mappings remain correct.
 * Update the change record and operational documentation.
 
-## 12. Command Summary
+## 11. Command Summary
 
 ```bash
 # Clear failed-login lock for the admin user
@@ -352,8 +340,5 @@ host.enter_maintenance_mode <host IP>
 host.exit_maintenance_mode <host IP>
 ```
 
-## Source and scope
-
-Prepared and organized from the supplied Nutanix training notes. Validate all commands, IP mappings, permissions, and failure behavior against the specific Nutanix AOS/Prism version and the organization's approved runbooks.
 
 
