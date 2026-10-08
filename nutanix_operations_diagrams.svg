@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1760" viewBox="0 0 1600 1760" role="img" aria-labelledby="title desc">
+  <title id="title">Nutanix AHV and CVM Operations Diagrams</title>
+  <desc id="desc">Four diagrams covering AHV and CVM data paths, AHV maintenance workflow, host and CVM failures, and directory authorization.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}
+      .panel{fill:#ffffff;stroke:#cbd5e1;stroke-width:2}
+      .title{font:700 27px Arial,sans-serif;fill:#0f172a}
+      .subtitle{font:400 16px Arial,sans-serif;fill:#64748b}
+      .node{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .nodeGreen{fill:#ecfdf5;stroke:#059669;stroke-width:2}
+      .nodeAmber{fill:#fffbeb;stroke:#d97706;stroke-width:2}
+      .nodeRed{fill:#fef2f2;stroke:#dc2626;stroke-width:2}
+      .nodeGray{fill:#f1f5f9;stroke:#64748b;stroke-width:2}
+      .label{font:600 18px Arial,sans-serif;fill:#0f172a;text-anchor:middle}
+      .small{font:400 15px Arial,sans-serif;fill:#475569;text-anchor:middle}
+      .tiny{font:400 14px Arial,sans-serif;fill:#475569}
+      .edge{stroke:#2563eb;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .edgeGray{stroke:#64748b;stroke-width:3;fill:none;stroke-dasharray:8 7;marker-end:url(#arrowGray)}
+      .edgeText{font:600 14px Arial,sans-serif;fill:#334155;text-anchor:middle}
+      .note{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.5}
+      .step{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .decision{fill:#fff7ed;stroke:#ea580c;stroke-width:2}
+      .yes{font:700 14px Arial,sans-serif;fill:#059669}
+      .no{font:700 14px Arial,sans-serif;fill:#dc2626}
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1760"/>
+  <text x="800" y="52" class="title" text-anchor="middle" font-size="36">Nutanix AHV and CVM Operations</text>
+  <text x="800" y="82" class="subtitle" text-anchor="middle">Reference diagrams — replace placeholder labels with values from the target cluster</text>
+
+  <!-- Panel 1 -->
+  <rect class="panel" x="40" y="115" rx="18" width="740" height="720"/>
+  <text x="70" y="160" class="title">1. AHV–CVM Network and Data Path</text>
+  <text x="70" y="188" class="subtitle">Normal and alternate storage paths</text>
+
+  <rect class="node" x="90" y="300" rx="14" width="190" height="84"/>
+  <text x="185" y="333" class="label">Guest VM</text>
+  <text x="185" y="358" class="small">Workload</text>
+
+  <rect class="node" x="350" y="285" rx="14" width="210" height="114"/>
+  <text x="455" y="325" class="label">AHV Host</text>
+  <text x="455" y="352" class="small">AHV hypervisor IP</text>
+  <text x="455" y="375" class="small">Compute layer</text>
+
+  <rect class="nodeGreen" x="610" y="220" rx="14" width="145" height="114"/>
+  <text x="682" y="258" class="label">Local CVM</text>
+  <text x="682" y="285" class="small">CVM IP</text>
+  <text x="682" y="308" class="small">Normal path</text>
+
+  <rect class="nodeAmber" x="610" y="470" rx="14" width="145" height="114"/>
+  <text x="682" y="508" class="label">Healthy CVM</text>
+  <text x="682" y="535" class="small">Alternate CVM IP</text>
+  <text x="682" y="558" class="small">Failover path</text>
+
+  <path class="edge" d="M280 342 L350 342"/>
+  <text x="315" y="325" class="edgeText">VM runs on</text>
+  <path class="edge" d="M560 325 C590 300 595 280 610 280"/>
+  <text x="590" y="255" class="edgeText">Normal I/O</text>
+  <path class="edgeGray" d="M560 365 C590 420 595 510 610 520"/>
+  <text x="575" y="460" class="edgeText">Alternate data path</text>
+
+  <rect class="note" x="100" y="650" rx="12" width="620" height="100"/>
+  <text x="410" y="685" class="label">Important</text>
+  <text x="410" y="713" class="small">AHV and CVM use different IP addresses.</text>
+  <text x="410" y="737" class="small">Use the cluster's actual AHV and CVM IP mapping.</text>
+
+  <!-- Panel 2 -->
+  <rect class="panel" x="820" y="115" rx="18" width="740" height="720"/>
+  <text x="850" y="160" class="title">2. AHV Host Maintenance Workflow</text>
+  <text x="850" y="188" class="subtitle">Pre-check, evacuation, maintenance, and verification</text>
+
+  <rect class="step" x="895" y="235" rx="12" width="590" height="56"/>
+  <text x="1190" y="270" class="label">Check cluster status</text>
+  <path class="edge" d="M1190 291 L1190 325"/>
+
+  <rect class="step" x="895" y="325" rx="12" width="590" height="56"/>
+  <text x="1190" y="360" class="label">Run host.enter_maintenance_mode_check</text>
+  <path class="edge" d="M1190 381 L1190 415"/>
+
+  <polygon class="decision" points="1190,415 1315,480 1190,545 1065,480"/>
+  <text x="1190" y="475" class="label">Pre-check</text>
+  <text x="1190" y="500" class="label">passes?</text>
+
+  <path class="edge" d="M1065 480 L950 480 L950 570"/>
+  <text x="1002" y="465" class="no">No</text>
+  <rect class="nodeRed" x="865" y="570" rx="12" width="255" height="90"/>
+  <text x="992" y="607" class="label">Resolve issues</text>
+  <text x="992" y="633" class="small">Capacity, HA, affinity,</text>
+  <text x="992" y="653" class="small">or VM constraints</text>
+  <path class="edgeGray" d="M865 615 C835 615 835 353 895 353"/>
+
+  <path class="edge" d="M1315 480 L1425 480 L1425 570"/>
+  <text x="1370" y="465" class="yes">Yes</text>
+  <rect class="nodeGreen" x="1295" y="570" rx="12" width="255" height="90"/>
+  <text x="1422" y="607" class="label">Enter AHV host</text>
+  <text x="1422" y="633" class="small">maintenance mode</text>
+  <text x="1422" y="653" class="small">eligible VMs evacuate</text>
+
+  <path class="edge" d="M1422 660 L1422 708"/>
+  <rect class="step" x="1295" y="708" rx="12" width="255" height="84"/>
+  <text x="1422" y="741" class="label">Verify host.get</text>
+  <text x="1422" y="766" class="small">EnteredMaintenanceMode</text>
+  <text x="1422" y="785" class="small">schedulable=False</text>
+
+  <text x="865" y="735" class="tiny">After verification: perform approved maintenance, exit maintenance mode, and recheck cluster health.</text>
+
+  <!-- Panel 3 -->
+  <rect class="panel" x="40" y="875" rx="18" width="740" height="720"/>
+  <text x="70" y="920" class="title">3. AHV Failure Versus CVM Failure</text>
+  <text x="70" y="948" class="subtitle">Different failure domains produce different outcomes</text>
+
+  <rect class="decision" x="295" y="1015" rx="14" width="230" height="76"/>
+  <text x="410" y="1048" class="label">Failure type</text>
+  <text x="410" y="1074" class="small">Host or CVM?</text>
+
+  <path class="edge" d="M350 1091 L225 1160"/>
+  <path class="edge" d="M470 1091 L595 1160"/>
+  <text x="260" y="1120" class="edgeText">AHV host failure</text>
+  <text x="560" y="1120" class="edgeText">CVM failure</text>
+
+  <rect class="nodeRed" x="85" y="1160" rx="14" width="280" height="190"/>
+  <text x="225" y="1200" class="label">AHV host down</text>
+  <text x="225" y="1235" class="small">VM may restart on</text>
+  <text x="225" y="1260" class="small">another healthy host.</text>
+  <text x="225" y="1300" class="small">Live migration is not</text>
+  <text x="225" y="1325" class="small">guaranteed during hard failure.</text>
+
+  <rect class="nodeAmber" x="445" y="1160" rx="14" width="280" height="190"/>
+  <text x="585" y="1200" class="label">CVM down</text>
+  <text x="585" y="1235" class="small">VM may remain on AHV.</text>
+  <text x="585" y="1260" class="small">Healthy CVM may service</text>
+  <text x="585" y="1285" class="small">the redundant data path.</text>
+  <text x="585" y="1325" class="small">I/O interruption or</text>
+  <text x="585" y="1350" class="small">degraded performance is possible.</text>
+
+  <rect class="note" x="100" y="1430" rx="12" width="620" height="100"/>
+  <text x="410" y="1465" class="label">Always validate</text>
+  <text x="410" y="1493" class="small">Cluster status, VM state, data resiliency,</text>
+  <text x="410" y="1518" class="small">and alerts before and after recovery.</text>
+
+  <!-- Panel 4 -->
+  <rect class="panel" x="820" y="875" rx="18" width="740" height="720"/>
+  <text x="850" y="920" class="title">4. Active Directory / SAML Authorization</text>
+  <text x="850" y="948" class="subtitle">Centralized authentication with Nutanix role mapping</text>
+
+  <rect class="node" x="875" y="1030" rx="14" width="170" height="80"/>
+  <text x="960" y="1064" class="label">Users</text>
+  <text x="960" y="1089" class="small">Administrators</text>
+
+  <rect class="node" x="1100" y="1030" rx="14" width="170" height="80"/>
+  <text x="1185" y="1064" class="label">Directory</text>
+  <text x="1185" y="1089" class="small">Groups</text>
+
+  <rect class="nodeGreen" x="1325" y="1000" rx="14" width="185" height="140"/>
+  <text x="1417" y="1035" class="label">Identity provider</text>
+  <text x="1417" y="1065" class="small">Microsoft AD</text>
+  <text x="1417" y="1090" class="small">or SAML IdP</text>
+
+  <path class="edge" d="M1045 1070 L1100 1070"/>
+  <path class="edge" d="M1270 1070 L1325 1070"/>
+
+  <rect class="nodeAmber" x="1090" y="1200" rx="14" width="205" height="100"/>
+  <text x="1192" y="1238" class="label">Nutanix role</text>
+  <text x="1192" y="1265" class="small">mapping</text>
+  <path class="edge" d="M1417 1140 C1417 1180 1295 1180 1295 1240"/>
+
+  <rect class="nodeGreen" x="885" y="1390" rx="14" width="230" height="90"/>
+  <text x="1000" y="1427" class="label">Prism access</text>
+  <text x="1000" y="1454" class="small">Viewer / Operator / Admin</text>
+
+  <rect class="nodeGreen" x="1285" y="1390" rx="14" width="230" height="90"/>
+  <text x="1400" y="1427" class="label">AHV / VM access</text>
+  <text x="1400" y="1454" class="small">Authorized operations</text>
+
+  <path class="edge" d="M1140 1300 C1080 1340 1030 1350 1000 1390"/>
+  <path class="edge" d="M1245 1300 C1310 1340 1370 1350 1400 1390"/>
+
+  <rect class="nodeGray" x="1020" y="1515" rx="12" width="360" height="55"/>
+  <text x="1200" y="1550" class="label">Secured local emergency account</text>
+  <path class="edgeGray" d="M1200 1515 L1200 1480"/>
+</svg>
